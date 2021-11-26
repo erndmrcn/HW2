@@ -97,13 +97,89 @@ def moveDown8(currentNode):
         return None
 
 
+def moveLeft8A(currentNode):
+    # "LEFT"
+    tempState = copy(currentNode.state)
+    
+    x, y = findIndex(tempState, 0)
+    if y > 0:
+        temp = tempState[x][y - 1]
+        tempState[x][y - 1] = 0
+        tempState[x][y] = temp
+    
+    if tempState == currentNode.state:
+        tempNode = Node(tempState, currentNode, currentNode.cost)
+        return tempNode
+    else:
+        path = findPath(currentNode)
+        tempNode = Node(tempState, currentNode, manhattanDistance8(tempState) + len(path) + 1)
+        return tempNode
+        
+
+def moveUp8A(currentNode):
+    # "UP"
+    tempState = copy(currentNode.state)
+    
+    x, y = findIndex(tempState, 0)
+    if x > 0:
+        temp = tempState[x - 1][y]
+        tempState[x - 1][y] = 0
+        tempState[x][y] = temp
+    
+    if tempState == currentNode.state:
+        tempNode = Node(tempState, currentNode, currentNode.cost)
+        return tempNode
+    else:
+        path = findPath(currentNode)
+        tempNode = Node(tempState, currentNode, manhattanDistance8(tempState) + len(path) + 1)
+        return tempNode
+
+
+def moveRight8A(currentNode):
+    # "RIGHT"
+    tempState = copy(currentNode.state)
+    
+    x, y = findIndex(tempState, 0)
+    if y < 2:
+        temp = tempState[x][y + 1]
+        tempState[x][y + 1] = 0
+        tempState[x][y] = temp
+
+    if tempState == currentNode.state:
+        tempNode = Node(tempState, currentNode, currentNode.cost)
+        return tempNode
+    else:
+        path = findPath(currentNode)
+        tempNode = Node(tempState, currentNode, manhattanDistance8(tempState) + len(path) + 1)
+        return tempNode
+
+
+def moveDown8A(currentNode):
+    # "DOWN"
+    tempState = copy(currentNode.state)
+    
+    x, y = findIndex(tempState, 0)
+    if x < 2:
+        temp = tempState[x + 1][y]
+        tempState[x + 1][y] = 0
+        tempState[x][y] = temp
+
+    if tempState == currentNode.state:
+        tempNode = Node(tempState, currentNode, currentNode.cost)
+        return tempNode
+    else:
+        path = findPath(currentNode)
+        tempNode = Node(tempState, currentNode, manhattanDistance8(tempState) + len(path) + 1)
+        return tempNode
+
+
 # heuristic function
-def manhattanDistance8():
+def manhattanDistance8(tempState):
 
     heuristicEval = 0
 
     for i in range(0, 8):
-        x1, y1 = findIndex(startState, i)
+        x1, y1 = findIndex(tempState, i)
         x2, y2 = findIndex(targetState, i)
 
         distance = abs(x2 - x1) + abs(y2- y1)
@@ -178,9 +254,85 @@ def moveDownMaze(currentNode):
     tempNode = Node(tempPos, currentNode, currentNode.cost + 1)
     return tempNode
 
+def moveLeftMazeA(currentNode):
+    global maze
 
-def manhattanDistanceMaze():
-    global startPos, targetPos, currentPos
+    tempPos = [-1, -1]
+    tempPos[0] = currentNode.state[0]
+    tempPos[1] = currentNode.state[1]
+    x = tempPos[0]
+    y = tempPos[1]
+
+    if y > 0 and maze[x][y - 1] != "#":
+        tempPos[1] -= 1
+
+    if tempPos == currentNode.state:
+        return currentNode
+    else:
+        arr, depth = printPath(currentNode)
+        tempNode = Node(tempPos, currentNode, manhattanDistanceMaze(tempPos) + depth)
+        return tempNode
+
+def moveUpMazeA(currentNode):
+    global maze
+
+    tempPos = [-1, -1]
+    tempPos[0] = currentNode.state[0]
+    tempPos[1] = currentNode.state[1]
+    x = tempPos[0]
+    y = tempPos[1]
+    
+    if x > 0 and maze[x - 1][y] != "#":
+        tempPos[0] -= 1
+
+    if tempPos == currentNode.state:
+        return currentNode
+    else:
+        arr, depth = printPath(currentNode)
+        tempNode = Node(tempPos, currentNode, manhattanDistanceMaze(tempPos) + depth)
+        return tempNode
+
+def moveRightMazeA(currentNode):
+    global maze
+
+    tempPos = [-1, -1]
+    tempPos[0] = currentNode.state[0]
+    tempPos[1] = currentNode.state[1]
+    x = tempPos[0]
+    y = tempPos[1]
+    
+    if y < (mazeWidth - 1) and maze[x][y + 1] != "#":
+        tempPos[1] += 1
+
+    if tempPos == currentNode.state:
+        return currentNode
+    else:
+        arr, depth = printPath(currentNode)
+        tempNode = Node(tempPos, currentNode, manhattanDistanceMaze(tempPos) + depth)
+        return tempNode
+
+def moveDownMazeA(currentNode):
+    global maze, mazeHeight, mazeWidth
+
+    tempPos = [-1, -1]
+    tempPos[0] = currentNode.state[0]
+    tempPos[1] = currentNode.state[1]
+    x = tempPos[0]
+    y = tempPos[1]
+
+    if x < (mazeHeight - 1) and maze[x + 1][y] != '#':
+        tempPos[0] += 1
+
+    if tempPos == currentNode.state:
+        return currentNode
+    else:
+        arr, depth = printPath(currentNode)
+        tempNode = Node(tempPos, currentNode, manhattanDistanceMaze(tempPos) + depth)
+        return tempNode
+
+
+def manhattanDistanceMaze(currentPos):
+    global targetPos
     return abs(targetPos[0] - currentPos[0]) + abs(targetPos[1] - currentPos[1])
 
 
@@ -191,17 +343,22 @@ def findIndex(arr, val):
                 return i, j
 
 
-def convertState(state):
+def convertState(l):
+    result = []
+
+    for state in l:
+
+        res = ""
+        for row in state:
+            for col in row:
+                if col == 0:
+                    res += ' '
+                else:
+                    res += str(col)
+        
+        result.append(res)
     
-    res = ""
-    for row in state:
-        for col in row:
-            if col == 0:
-                res += ' '
-            else:
-                res += str(col)
-    
-    return res
+    return result
 
 
 # current state is a node
@@ -223,6 +380,25 @@ def expand8(currentState):
         children.append(node4)
     
     return children
+    
+def expand8A(currentState):
+    
+    node1 = moveLeft8A(currentState)
+    node2 = moveUp8A(currentState)
+    node3 = moveRight8A(currentState)
+    node4 = moveDown8A(currentState)
+
+    children = []
+    if node1 != None:
+        children.append(node1)
+    if node2 != None:
+        children.append(node2)
+    if node3 != None:
+        children.append(node3)
+    if node4 != None:
+        children.append(node4)
+    
+    return children
 
 
 def expandMaze(currentNode):
@@ -231,6 +407,25 @@ def expandMaze(currentNode):
     node2 = moveUpMaze(currentNode)
     node3 = moveRightMaze(currentNode)
     node4 = moveDownMaze(currentNode)
+
+    children = []
+    if node1 != None:
+        children.append(node1)
+    if node2 != None:
+        children.append(node2)
+    if node3 != None:
+        children.append(node3)
+    if node4 != None:
+        children.append(node4)
+
+    return children
+
+def expandMazeA(currentNode):
+
+    node1 = moveLeftMazeA(currentNode)
+    node2 = moveUpMazeA(currentNode)
+    node3 = moveRightMazeA(currentNode)
+    node4 = moveDownMazeA(currentNode)
 
     children = []
     if node1 != None:
@@ -282,6 +477,7 @@ def readProblem(fileName):
             index2 = line.index(')')
             sx = line[1:index1]
             sy = line[index1+1:index2]
+            startPos = []
             startPos.append(int(sx))
             startPos.append(int(sy))
             startPos = startPos[::-1]
@@ -292,11 +488,11 @@ def readProblem(fileName):
             index2 = line.index(')')
             tx = line[1:index1]
             ty = line[index1+1:index2]
+            targetPos= []
             targetPos.append(int(tx))
             targetPos.append(int(ty))
             targetPos = targetPos[::-1]
 
-            print("TargetPos:", targetPos)
             row = []
             line = f.readline()
             while line:
@@ -317,23 +513,35 @@ def readProblem(fileName):
 
 # clear global variables and data structures
 def clear():
+    global startState, targetState, startPos, targetPos, maze, path
     startState = []
     targetState = []
+
+    startPos = []
+    targetPos = [] 
+    currentPos = []
+
+    maze = []
+    mazeWidth = -1
+    mazeHeight = -1
+
+    path = []
+    eightPuzzle = True
     return
 
 def InformedSearch(methodName, fileName):
 
     if methodName == "UCS":
-        clear()
         readProblem(fileName)
-        UCS()
-        return
+        result = UCS()
+        clear()
+        return result
 
     elif methodName == "AStar":
-        clear()
         readProblem(fileName)
-        AStar()
-        return
+        result = AStar()
+        clear()
+        return result
 
     else:
         print("Unknown search method")
@@ -381,8 +589,10 @@ def UCS():
 
             if currentNode.state == targetState:
                 path = findPath(currentNode)
-                return currentNode, path
-            explored.extend(currentNode.state)
+                exp = convertState(explored)
+                return path, exp, len(path), currentNode.cost
+
+            explored.append(currentNode.state)
             children = expand8(currentNode)
             for child in children:
                 if check(child.state) == False:
@@ -403,14 +613,13 @@ def UCS():
         while len(frontier) > 0:
             sort()
             currentNode = frontier.pop(0)
-            if currentNode.state == [20, 19]:
-                print(currentNode.cost)
 
             if currentNode.state == targetPos:
-                result = printPath(currentNode)
-                return currentNode, result
+                path, depth = printPath(currentNode)
+                exp = arrangeList(explored)
+                return path, exp, depth - 1, currentNode.cost
             
-            explored.extend(currentNode.state)
+            explored.append(currentNode.state)
             children = expandMaze(currentNode)
             for child in children:
                 if check(child.state) == False:
@@ -424,15 +633,23 @@ def UCS():
         # means maze problem
         
 
+def arrangeList(exp):
+    result = []
+    for e in exp:
+        result.append((e[1], e[0]))
+    return result
+
 def printPath(currentNode):
     r = []
+    depth = 0
     while currentNode:
         pos = currentNode.state
         t = (pos[1], pos[0])
         r.append(t)
         currentNode = currentNode.parent
+        depth += 1
 
-    return r[::-1]
+    return r[::-1], depth
 
 
 def findDir(arr1, arr2):
@@ -448,8 +665,10 @@ def findDir(arr1, arr2):
     if (y2 - y1) == -1:
         return 'RIGHT'
 
+
 def findPath(currentNode):
     r = []
+
     while currentNode and currentNode.parent:
         dir = findDir(currentNode.state, currentNode.parent.state)
         r.append(dir)
@@ -460,6 +679,59 @@ def findPath(currentNode):
 
 # A* search
 def AStar():
+    global frontier, explored 
+
+    if eightPuzzle == True:
+        frontier = [Node(startState, None, 0)]
+        explored = []
+
+        while len(frontier) > 0:
+            sort()
+            currentNode = frontier.pop(0)
+
+            if currentNode.state == targetState:
+                path = findPath(currentNode)
+                exp = convertState(explored)
+                return path, exp, len(path), currentNode.cost
+
+            explored.append(currentNode.state)
+            children = expand8A(currentNode)
+            for child in children:
+                if check(child.state) == False:
+                    frontier.append(child)
+                else:
+                    for e in frontier:
+                        if child.state == e.state and child.cost < e.cost:
+                            index = frontier.index(e)
+                            frontier[index] = child
+                    
+
+        return None
+
+    elif eightPuzzle == False:
+        frontier = [Node(startPos, None, 0)]
+        explored = []
+
+        while len(frontier) > 0:
+            sort()
+            currentNode = frontier.pop(0)
+
+            if currentNode.state == targetPos:
+                path, depth = printPath(currentNode)
+                exp = arrangeList(explored)
+                return path, exp, depth - 1, currentNode.cost
+            
+            explored.append(currentNode.state)
+            children = expandMazeA(currentNode)
+            for child in children:
+                if check(child.state) == False:
+                    frontier.append(child)
+                else:
+                    for e in frontier:
+                        if child.state == e.state and child.cost < e.cost:
+                            index = frontier.index(e)
+                            frontier[index] = child
+        return None
     return
 
 def printArr(state):
@@ -467,8 +739,3 @@ def printArr(state):
         print(row)
     
     return
-
-readProblem("maze1.txt")
-
-result, path = UCS()
-print(path)
