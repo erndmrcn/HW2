@@ -231,139 +231,165 @@ def manhattanDistance8(tempState):
 ####### Maze Utilities Start #######
 def moveLeftMaze(currentNode):
     global maze
+    
+    # update cost according to the ucs method ->: +1
+    if isUCS:
+        tempPos = [-1, -1]
+        tempPos[0] = currentNode.state[0]
+        tempPos[1] = currentNode.state[1]
+        x = tempPos[0]
+        y = tempPos[1]
 
-    tempPos = [-1, -1]
-    tempPos[0] = currentNode.state[0]
-    tempPos[1] = currentNode.state[1]
-    x = tempPos[0]
-    y = tempPos[1]
+        if y > 0 and maze[x][y - 1] != "#":
+            tempPos[1] -= 1
 
-    if y > 0 and maze[x][y - 1] != "#":
-        tempPos[1] -= 1
+        tempNode = Node(tempPos, currentNode, currentNode.cost + 1)
+        return tempNode
 
-    tempNode = Node(tempPos, currentNode, currentNode.cost + 1)
-    return tempNode
+    # update cost according to the A* method ->: cost up to the current node + estimated(mannhattan)
+    else:
+        tempPos = [-1, -1]
+        tempPos[0] = currentNode.state[0]
+        tempPos[1] = currentNode.state[1]
+        x = tempPos[0]
+        y = tempPos[1]
+
+        if y > 0 and maze[x][y - 1] != "#":
+            tempPos[1] -= 1
+
+        if tempPos == currentNode.state:
+            return currentNode
+        else:
+            arr, depth = printPath(currentNode)
+            tempNode = Node(tempPos, currentNode, manhattanDistanceMaze(tempPos) + depth)
+            return tempNode
+
 
 def moveUpMaze(currentNode):
     global maze
 
-    tempPos = [-1, -1]
-    tempPos[0] = currentNode.state[0]
-    tempPos[1] = currentNode.state[1]
-    x = tempPos[0]
-    y = tempPos[1]
-    
-    if x > 0 and maze[x - 1][y] != "#":
-        tempPos[0] -= 1
+    # update cost according to the ucs method ->: +1
+    if isUCS:
+        tempPos = [-1, -1]
+        tempPos[0] = currentNode.state[0]
+        tempPos[1] = currentNode.state[1]
+        x = tempPos[0]
+        y = tempPos[1]
+        
+        if x > 0 and maze[x - 1][y] != "#":
+            tempPos[0] -= 1
 
-    tempNode = Node(tempPos, currentNode, currentNode.cost + 1)
-    return tempNode
+        tempNode = Node(tempPos, currentNode, currentNode.cost + 1)
+        return tempNode
+
+    # update cost according to the A* method ->: cost up to the current node + estimated(mannhattan)
+    else:
+        tempPos = [-1, -1]
+        tempPos[0] = currentNode.state[0]
+        tempPos[1] = currentNode.state[1]
+        x = tempPos[0]
+        y = tempPos[1]
+        
+        if x > 0 and maze[x - 1][y] != "#":
+            tempPos[0] -= 1
+
+        if tempPos == currentNode.state:
+            return currentNode
+        else:
+            arr, depth = printPath(currentNode)
+            tempNode = Node(tempPos, currentNode, manhattanDistanceMaze(tempPos) + depth)
+            return tempNode
+
 
 def moveRightMaze(currentNode):
     global maze
 
-    tempPos = [-1, -1]
-    tempPos[0] = currentNode.state[0]
-    tempPos[1] = currentNode.state[1]
-    x = tempPos[0]
-    y = tempPos[1]
-    
-    if y < (mazeWidth - 1) and maze[x][y + 1] != "#":
-        tempPos[1] += 1
+    # update cost according to the ucs method ->: +1
+    if isUCS:
+        tempPos = [-1, -1]
+        tempPos[0] = currentNode.state[0]
+        tempPos[1] = currentNode.state[1]
+        x = tempPos[0]
+        y = tempPos[1]
+        
+        if y < (mazeWidth - 1) and maze[x][y + 1] != "#":
+            tempPos[1] += 1
 
-    tempNode = Node(tempPos, currentNode, currentNode.cost + 1)
-    return tempNode
+        tempNode = Node(tempPos, currentNode, currentNode.cost + 1)
+        return tempNode
+
+    # update cost according to the A* method ->: cost up to the current node + estimated(mannhattan)
+    else:
+        tempPos = [-1, -1]
+        tempPos[0] = currentNode.state[0]
+        tempPos[1] = currentNode.state[1]
+        x = tempPos[0]
+        y = tempPos[1]
+        
+        if y < (mazeWidth - 1) and maze[x][y + 1] != "#":
+            tempPos[1] += 1
+
+        if tempPos == currentNode.state:
+            return currentNode
+        else:
+            arr, depth = printPath(currentNode)
+            tempNode = Node(tempPos, currentNode, manhattanDistanceMaze(tempPos) + depth)
+            return tempNode
 
 def moveDownMaze(currentNode):
     global maze, mazeHeight, mazeWidth
 
-    tempPos = [-1, -1]
-    tempPos[0] = currentNode.state[0]
-    tempPos[1] = currentNode.state[1]
-    x = tempPos[0]
-    y = tempPos[1]
+    # update cost according to the ucs method ->: +1
+    if isUCS:
+        tempPos = [-1, -1]
+        tempPos[0] = currentNode.state[0]
+        tempPos[1] = currentNode.state[1]
+        x = tempPos[0]
+        y = tempPos[1]
 
-    if x < (mazeHeight - 1) and maze[x + 1][y] != '#':
-        tempPos[0] += 1
+        if x < (mazeHeight - 1) and maze[x + 1][y] != '#':
+            tempPos[0] += 1
 
-    tempNode = Node(tempPos, currentNode, currentNode.cost + 1)
-    return tempNode
-
-def moveLeftMazeA(currentNode):
-    global maze
-
-    tempPos = [-1, -1]
-    tempPos[0] = currentNode.state[0]
-    tempPos[1] = currentNode.state[1]
-    x = tempPos[0]
-    y = tempPos[1]
-
-    if y > 0 and maze[x][y - 1] != "#":
-        tempPos[1] -= 1
-
-    if tempPos == currentNode.state:
-        return currentNode
-    else:
-        arr, depth = printPath(currentNode)
-        tempNode = Node(tempPos, currentNode, manhattanDistanceMaze(tempPos) + depth)
+        tempNode = Node(tempPos, currentNode, currentNode.cost + 1)
         return tempNode
-
-def moveUpMazeA(currentNode):
-    global maze
-
-    tempPos = [-1, -1]
-    tempPos[0] = currentNode.state[0]
-    tempPos[1] = currentNode.state[1]
-    x = tempPos[0]
-    y = tempPos[1]
     
-    if x > 0 and maze[x - 1][y] != "#":
-        tempPos[0] -= 1
-
-    if tempPos == currentNode.state:
-        return currentNode
+    # update cost according to the A* method ->: cost up to the current node + estimated(mannhattan)
     else:
-        arr, depth = printPath(currentNode)
-        tempNode = Node(tempPos, currentNode, manhattanDistanceMaze(tempPos) + depth)
-        return tempNode
+        tempPos = [-1, -1]
+        tempPos[0] = currentNode.state[0]
+        tempPos[1] = currentNode.state[1]
+        x = tempPos[0]
+        y = tempPos[1]
 
-def moveRightMazeA(currentNode):
-    global maze
+        if x < (mazeHeight - 1) and maze[x + 1][y] != '#':
+            tempPos[0] += 1
 
-    tempPos = [-1, -1]
-    tempPos[0] = currentNode.state[0]
-    tempPos[1] = currentNode.state[1]
-    x = tempPos[0]
-    y = tempPos[1]
+        if tempPos == currentNode.state:
+            return currentNode
+        else:
+            arr, depth = printPath(currentNode)
+            tempNode = Node(tempPos, currentNode, manhattanDistanceMaze(tempPos) + depth)
+            return tempNode
+
+# def moveLeftMazeA(currentNode):
+#     global maze
+
     
-    if y < (mazeWidth - 1) and maze[x][y + 1] != "#":
-        tempPos[1] += 1
 
-    if tempPos == currentNode.state:
-        return currentNode
-    else:
-        arr, depth = printPath(currentNode)
-        tempNode = Node(tempPos, currentNode, manhattanDistanceMaze(tempPos) + depth)
-        return tempNode
+# def moveUpMazeA(currentNode):
+#     global maze
 
-def moveDownMazeA(currentNode):
-    global maze, mazeHeight, mazeWidth
+    
 
-    tempPos = [-1, -1]
-    tempPos[0] = currentNode.state[0]
-    tempPos[1] = currentNode.state[1]
-    x = tempPos[0]
-    y = tempPos[1]
+# def moveRightMazeA(currentNode):
+#     global maze
 
-    if x < (mazeHeight - 1) and maze[x + 1][y] != '#':
-        tempPos[0] += 1
+    
 
-    if tempPos == currentNode.state:
-        return currentNode
-    else:
-        arr, depth = printPath(currentNode)
-        tempNode = Node(tempPos, currentNode, manhattanDistanceMaze(tempPos) + depth)
-        return tempNode
+# def moveDownMazeA(currentNode):
+#     global maze, mazeHeight, mazeWidth
+
+    
 
 
 def manhattanDistanceMaze(currentPos):
@@ -455,24 +481,24 @@ def expandMaze(currentNode):
 
     return children
 
-def expandMazeA(currentNode):
+# def expandMazeA(currentNode):
 
-    node1 = moveLeftMazeA(currentNode)
-    node2 = moveUpMazeA(currentNode)
-    node3 = moveRightMazeA(currentNode)
-    node4 = moveDownMazeA(currentNode)
+#     node1 = moveLeftMazeA(currentNode)
+#     node2 = moveUpMazeA(currentNode)
+#     node3 = moveRightMazeA(currentNode)
+#     node4 = moveDownMazeA(currentNode)
 
-    children = []
-    if node1 != None:
-        children.append(node1)
-    if node2 != None:
-        children.append(node2)
-    if node3 != None:
-        children.append(node3)
-    if node4 != None:
-        children.append(node4)
+#     children = []
+#     if node1 != None:
+#         children.append(node1)
+#     if node2 != None:
+#         children.append(node2)
+#     if node3 != None:
+#         children.append(node3)
+#     if node4 != None:
+#         children.append(node4)
 
-    return children
+#     return children
 
 # read file into the variables and structures
 def readProblem(fileName):
@@ -761,7 +787,7 @@ def AStar():
                 return path, exp, depth - 1, currentNode.cost
             
             explored.append(currentNode.state)
-            children = expandMazeA(currentNode)
+            children = expandMaze(currentNode)
             for child in children:
                 if check(child.state) == False:
                     frontier.append(child)
