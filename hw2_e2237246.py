@@ -1,6 +1,7 @@
 # Eren Demircan - 2237246
 # CEng462 Artificial Intelligence - HW2
 # UCS and A* with Graph Search Algorithm
+
 # Code is messy but easy to understand
 # most utility functions are written seperately for 8-Puzzle and Maze problems
 # That's why it is long and messy
@@ -8,7 +9,7 @@
 # Mannhattan Distance Heuristic is selected
 # Heuristic functions should be admissible which means that
 # they should not over estimate the distance between the current state and the target state.
-# Mannhattan distance or city block heuristic never over estimates because it always finds 
+# Mannhattan distance or city block heuristic never over estimates (admissible) because it always finds 
 # the shortest distance to the goal. One cannot go to the goal state with less then the Mannhattan distance between the current state and the goal state.
 # So selection of manhattanDistance is valid.
 
@@ -582,8 +583,11 @@ def expandMaze(currentNode):
 
 ###### Maze Utilities End ######
 
-# Uniform-Cost Search
-def UCS():
+# since A* and UCS are identical except cost
+# I used the same function
+# by using flags, costs are updated according to 
+# the methodName in the move functions
+def graphSearch():
     global eightPuzzle
     global frontier, explored
     
@@ -639,63 +643,6 @@ def UCS():
                             frontier[index] = child
         return None
 
-# A* search
-def AStar():
-    global frontier, explored 
-
-    if eightPuzzle == True:
-        frontier = [Node(startState, None, 0)]
-        explored = []
-
-        while len(frontier) > 0:
-            sort()
-            currentNode = frontier.pop(0)
-
-            if currentNode.state == targetState:
-                path = findPath(currentNode)
-                exp = convertState(explored)
-                return path, exp, len(path), currentNode.cost
-
-            explored.append(currentNode.state)
-            children = expand8(currentNode)
-            for child in children:
-                if check(child.state) == False:
-                    frontier.append(child)
-                else:
-                    for e in frontier:
-                        if child.state == e.state and child.cost < e.cost:
-                            index = frontier.index(e)
-                            frontier[index] = child
-                    
-
-        return None
-
-    elif eightPuzzle == False:
-        frontier = [Node(startPos, None, 0)]
-        explored = []
-
-        while len(frontier) > 0:
-            sort()
-            currentNode = frontier.pop(0)
-
-            if currentNode.state == targetPos:
-                path, depth = printPath(currentNode)
-                exp = arrangeList(explored)
-                return path, exp, depth - 1, currentNode.cost
-            
-            explored.append(currentNode.state)
-            children = expandMaze(currentNode)
-            for child in children:
-                if check(child.state) == False:
-                    frontier.append(child)
-                else:
-                    for e in frontier:
-                        if child.state == e.state and child.cost < e.cost:
-                            index = frontier.index(e)
-                            frontier[index] = child
-        return None
-    return
-
 # function will be called
 def InformedSearch(methodName, fileName):
 
@@ -703,19 +650,10 @@ def InformedSearch(methodName, fileName):
 
     if methodName == "UCS":
         isUCS = True
-        readProblem(fileName)
-        result = UCS()
-        clear()
-        return result
-
-    elif methodName == "AStar":
-        isUCS = False
-        readProblem(fileName)
-        result = AStar()
-        clear()
-        return result
-
     else:
-        print("Unknown search method")
-    
-    return
+        isUCS = False
+
+    readProblem(fileName)
+    result = graphSearch()
+    clear()
+    return result
