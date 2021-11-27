@@ -2,22 +2,28 @@
 # CEng462 Artificial Intelligence - HW2
 # UCS and A* with Graph Search Algorithm
 
-# Explain the heuristic function and the reasoning behind it
+# Mannhattan Distance Heuristic is selected
+# Heuristic functions should be admissible which means that
+# they should not over estimate the distance between the current state and the target state.
+# Mannhattan distance or city block heuristic never over estimates because it always finds 
+# the shortest distance to the goal. One cannot go to the goal state with less then the Mannhattan distance between the current state and the goal state.
+# So selection of manhattanDistance is valid.
 
 # global variables, data structures
+# eight-puzzle variables
 startState = []
 targetState = []
+eightPuzzle = True
 
+# maze variables
 startPos = []
 targetPos = [] 
 currentPos = []
-
 maze = []
 mazeWidth = -1
 mazeHeight = -1
 
 path = []
-eightPuzzle = True
 
 class Node:
     def __init__(self, state, parent, cost):
@@ -26,7 +32,7 @@ class Node:
         self.parent = parent
         self.cost = cost
 
-
+# deep copy function for state copy
 def copy(arr):
     result = [ [ 0 for x in range(len(arr[0]))] for y in range(len(arr))]
 
@@ -36,141 +42,147 @@ def copy(arr):
 
     return result
 
+
 ####### 8-Puzzle Utilities Start #######
 def moveLeft8(currentNode):
     # "LEFT"
-    tempNode = Node(None, currentNode, currentNode.cost + 1)
-    tempNode.state = copy(currentNode.state)
+
+    # update cost according to the ucs method ->: +1
+    if isUCS:
+        tempNode = Node(None, currentNode, currentNode.cost + 1)
+        tempNode.state = copy(currentNode.state)
+        
+        x, y = findIndex(tempNode.state, 0)
+        if y > 0:
+            temp = tempNode.state[x][y - 1]
+            tempNode.state[x][y - 1] = 0
+            tempNode.state[x][y] = temp
+            return tempNode
+        else:
+            return None
     
-    x, y = findIndex(tempNode.state, 0)
-    if y > 0:
-        temp = tempNode.state[x][y - 1]
-        tempNode.state[x][y - 1] = 0
-        tempNode.state[x][y] = temp
-        return tempNode
+    # update cost according to the A* method ->: cost up to the current node + estimated(mannhattan)
     else:
-        return None
+        tempState = copy(currentNode.state)
+    
+        x, y = findIndex(tempState, 0)
+        if y > 0:
+            temp = tempState[x][y - 1]
+            tempState[x][y - 1] = 0
+            tempState[x][y] = temp
+        
+        if tempState == currentNode.state:
+            tempNode = Node(tempState, currentNode, currentNode.cost)
+            return tempNode
+        else:
+            path = findPath(currentNode)
+            tempNode = Node(tempState, currentNode, manhattanDistance8(tempState) + len(path) + 1)
+            return tempNode
 
 
 def moveUp8(currentNode):
     # "UP"
-    tempNode = Node(None, currentNode, currentNode.cost + 1)
-    tempNode.state = copy(currentNode.state)
+    # update cost according to the ucs method ->: +1
+    if isUCS:
+        tempNode = Node(None, currentNode, currentNode.cost + 1)
+        tempNode.state = copy(currentNode.state)
+        
+        x, y = findIndex(tempNode.state, 0)
+        if x > 0:
+            temp = tempNode.state[x - 1][y]
+            tempNode.state[x - 1][y] = 0
+            tempNode.state[x][y] = temp
+            return tempNode
+        else:
+            return None
     
-    x, y = findIndex(tempNode.state, 0)
-    if x > 0:
-        temp = tempNode.state[x - 1][y]
-        tempNode.state[x - 1][y] = 0
-        tempNode.state[x][y] = temp
-        return tempNode
+    # update cost according to the A* method ->: cost up to the current node + estimated(mannhattan)
     else:
-        return None
+        tempState = copy(currentNode.state)
+    
+        x, y = findIndex(tempState, 0)
+        if x > 0:
+            temp = tempState[x - 1][y]
+            tempState[x - 1][y] = 0
+            tempState[x][y] = temp
+        
+        if tempState == currentNode.state:
+            tempNode = Node(tempState, currentNode, currentNode.cost)
+            return tempNode
+        else:
+            path = findPath(currentNode)
+            tempNode = Node(tempState, currentNode, manhattanDistance8(tempState) + len(path) + 1)
+            return tempNode
 
 
 def moveRight8(currentNode):
     # "RIGHT"
-    tempNode = Node(None, currentNode, currentNode.cost + 1)
-    tempNode.state = copy(currentNode.state)
+    # update cost according to the ucs method ->: +1
+    if isUCS:
+        tempNode = Node(None, currentNode, currentNode.cost + 1)
+        tempNode.state = copy(currentNode.state)
+        
+        x, y = findIndex(tempNode.state, 0)
+        if y < 2:
+            temp = tempNode.state[x][y + 1]
+            tempNode.state[x][y + 1] = 0
+            tempNode.state[x][y] = temp
+            return tempNode
+        else:
+            return None
     
-    x, y = findIndex(tempNode.state, 0)
-    if y < 2:
-        temp = tempNode.state[x][y + 1]
-        tempNode.state[x][y + 1] = 0
-        tempNode.state[x][y] = temp
-        return tempNode
+    # update cost according to the A* method ->: cost up to the current node + estimated(mannhattan)
     else:
-        return None
+        tempState = copy(currentNode.state)
+        
+        x, y = findIndex(tempState, 0)
+        if y < 2:
+            temp = tempState[x][y + 1]
+            tempState[x][y + 1] = 0
+            tempState[x][y] = temp
+
+        if tempState == currentNode.state:
+            tempNode = Node(tempState, currentNode, currentNode.cost)
+            return tempNode
+        else:
+            path = findPath(currentNode)
+            tempNode = Node(tempState, currentNode, manhattanDistance8(tempState) + len(path) + 1)
+            return tempNode
 
 
 def moveDown8(currentNode):
     # "DOWN"
-    tempNode = Node(None, currentNode, currentNode.cost + 1)
-    tempNode.state = copy(currentNode.state)
-    
-    x, y = findIndex(tempNode.state, 0)
-    if x < 2:
-        temp = tempNode.state[x + 1][y]
-        tempNode.state[x + 1][y] = 0
-        tempNode.state[x][y] = temp
-        return tempNode
-    else:
-        return None
-
-
-def moveLeft8A(currentNode):
-    # "LEFT"
-    tempState = copy(currentNode.state)
-    
-    x, y = findIndex(tempState, 0)
-    if y > 0:
-        temp = tempState[x][y - 1]
-        tempState[x][y - 1] = 0
-        tempState[x][y] = temp
-    
-    if tempState == currentNode.state:
-        tempNode = Node(tempState, currentNode, currentNode.cost)
-        return tempNode
-    else:
-        path = findPath(currentNode)
-        tempNode = Node(tempState, currentNode, manhattanDistance8(tempState) + len(path) + 1)
-        return tempNode
+    # update cost according to the ucs method ->: +1
+    if isUCS:
+        tempNode = Node(None, currentNode, currentNode.cost + 1)
+        tempNode.state = copy(currentNode.state)
         
-
-def moveUp8A(currentNode):
-    # "UP"
-    tempState = copy(currentNode.state)
-    
-    x, y = findIndex(tempState, 0)
-    if x > 0:
-        temp = tempState[x - 1][y]
-        tempState[x - 1][y] = 0
-        tempState[x][y] = temp
-    
-    if tempState == currentNode.state:
-        tempNode = Node(tempState, currentNode, currentNode.cost)
-        return tempNode
+        x, y = findIndex(tempNode.state, 0)
+        if x < 2:
+            temp = tempNode.state[x + 1][y]
+            tempNode.state[x + 1][y] = 0
+            tempNode.state[x][y] = temp
+            return tempNode
+        else:
+            return None
+        
+    # update cost according to the A* method ->: cost up to the current node + estimated(mannhattan)
     else:
-        path = findPath(currentNode)
-        tempNode = Node(tempState, currentNode, manhattanDistance8(tempState) + len(path) + 1)
-        return tempNode
-
-
-def moveRight8A(currentNode):
-    # "RIGHT"
-    tempState = copy(currentNode.state)
+        tempState = copy(currentNode.state)
     
-    x, y = findIndex(tempState, 0)
-    if y < 2:
-        temp = tempState[x][y + 1]
-        tempState[x][y + 1] = 0
-        tempState[x][y] = temp
+        x, y = findIndex(tempState, 0)
+        if x < 2:
+            temp = tempState[x + 1][y]
+            tempState[x + 1][y] = 0
+            tempState[x][y] = temp
 
-    if tempState == currentNode.state:
-        tempNode = Node(tempState, currentNode, currentNode.cost)
-        return tempNode
-    else:
-        path = findPath(currentNode)
-        tempNode = Node(tempState, currentNode, manhattanDistance8(tempState) + len(path) + 1)
-        return tempNode
-
-
-def moveDown8A(currentNode):
-    # "DOWN"
-    tempState = copy(currentNode.state)
-    
-    x, y = findIndex(tempState, 0)
-    if x < 2:
-        temp = tempState[x + 1][y]
-        tempState[x + 1][y] = 0
-        tempState[x][y] = temp
-
-    if tempState == currentNode.state:
-        tempNode = Node(tempState, currentNode, currentNode.cost)
-        return tempNode
-    else:
-        path = findPath(currentNode)
-        tempNode = Node(tempState, currentNode, manhattanDistance8(tempState) + len(path) + 1)
-        return tempNode
+        if tempState == currentNode.state:
+            tempNode = Node(tempState, currentNode, currentNode.cost)
+            return tempNode
+        else:
+            path = findPath(currentNode)
+            tempNode = Node(tempState, currentNode, manhattanDistance8(tempState) + len(path) + 1)
+            return tempNode
 
 
 # heuristic function
@@ -186,6 +198,29 @@ def manhattanDistance8(tempState):
         heuristicEval += distance
 
     return heuristicEval
+
+####### 8-Puzzle Utilities End #######
+
+# def moveLeft8A(currentNode):
+#     # "LEFT"
+    
+        
+
+# def moveUp8A(currentNode):
+#     # "UP"
+    
+
+
+# def moveRight8A(currentNode):
+#     # "RIGHT"
+    
+
+
+# def moveDown8A(currentNode):
+#     # "DOWN"
+
+
+
 
 # [######### #  #]
 # [####      # ##]
@@ -381,24 +416,24 @@ def expand8(currentState):
     
     return children
     
-def expand8A(currentState):
+# def expand8A(currentState):
     
-    node1 = moveLeft8A(currentState)
-    node2 = moveUp8A(currentState)
-    node3 = moveRight8A(currentState)
-    node4 = moveDown8A(currentState)
+#     node1 = moveLeft8A(currentState)
+#     node2 = moveUp8A(currentState)
+#     node3 = moveRight8A(currentState)
+#     node4 = moveDown8A(currentState)
 
-    children = []
-    if node1 != None:
-        children.append(node1)
-    if node2 != None:
-        children.append(node2)
-    if node3 != None:
-        children.append(node3)
-    if node4 != None:
-        children.append(node4)
+#     children = []
+#     if node1 != None:
+#         children.append(node1)
+#     if node2 != None:
+#         children.append(node2)
+#     if node3 != None:
+#         children.append(node3)
+#     if node4 != None:
+#         children.append(node4)
     
-    return children
+#     return children
 
 
 def expandMaze(currentNode):
@@ -531,13 +566,17 @@ def clear():
 
 def InformedSearch(methodName, fileName):
 
+    global isUCS
+
     if methodName == "UCS":
+        isUCS = True
         readProblem(fileName)
         result = UCS()
         clear()
         return result
 
     elif methodName == "AStar":
+        isUCS = False
         readProblem(fileName)
         result = AStar()
         clear()
@@ -695,7 +734,7 @@ def AStar():
                 return path, exp, len(path), currentNode.cost
 
             explored.append(currentNode.state)
-            children = expand8A(currentNode)
+            children = expand8(currentNode)
             for child in children:
                 if check(child.state) == False:
                     frontier.append(child)
@@ -733,6 +772,7 @@ def AStar():
                             frontier[index] = child
         return None
     return
+
 
 def printArr(state):
     for row in state:
